@@ -155,15 +155,13 @@ public class GamepadDisplay
 
     public void DisplayExistingInputs(Vector2 position, int fontSize, int gap)
     {
-        // circles
+        // buttons / circles
         float radius = fontSize / 2f;
         Vector2 circleOffset = new Vector2(radius, radius);
-        // text
-        int textX = (int)position.X + (int)(radius * 2 + gap);
-        int axisWidthFactor = 3;
-        // rect
-        Vector2 rectSize = new Vector2(fontSize * axisWidthFactor, fontSize);
-        //
+        // axes / rects
+        int axisDisplayWidth = fontSize * 3;
+        Vector2 rectSize = new Vector2(axisDisplayWidth, fontSize);
+        // info
         string infoID = $"ID: {DeviceID}";
         string infoAxis = $"Axis Count: {AxisCount}";
 
@@ -176,6 +174,7 @@ public class GamepadDisplay
         position.Y += fontSize + gap;
 
         // BUTTONS
+        int textX = (int)position.X + (int)(radius * 2 + gap);
         foreach (var button in ExistingButtons)
         {
             int textY = (int)position.Y;
@@ -185,7 +184,7 @@ public class GamepadDisplay
         }
 
         // AXIS
-        textX = (int)position.X + (fontSize * axisWidthFactor + gap);
+        textX = (int)position.X + axisDisplayWidth + gap;
         foreach (var axis in ExistingAxes)
         {
             int textY = (int)position.Y;
