@@ -5,6 +5,7 @@ internal class Program
 {
     // If you need variables in the Program class (outside functions), you must mark them as static
     static string title = "Game Title";
+    static GamepadDisplay x = new GamepadDisplay(0);
 
     static void Main(string[] args)
     {
@@ -42,5 +43,12 @@ internal class Program
     static void Update()
     {
         // Your game code run each frame here
+        //x.DrawDeviceInformation(new(10, 10), 32);
+        //x.DrawAxis2(new(200, 200), 50, GamepadAxis.LeftX, GamepadAxis.LeftY);
+        //x.DrawButtonDown(new(100, 200), 10, GamepadButton.RightFaceRight);
+        //x.Draw8bitdoGamepad(new(200, 200), 32, 50, 10);
+
+        x.PollInputsForExistence();
+        x.DisplayExistingInputs(new(10, 10), 24, 5);
     }
 }
