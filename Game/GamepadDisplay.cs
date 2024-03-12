@@ -29,8 +29,26 @@ public class GamepadDisplay
         Rectangle outline = new Rectangle(position, size);
         Rectangle fill = outline;
         float value = Raylib.GetGamepadAxisMovement(DeviceID, axis);
-        fill.Width *= MathF.Abs(value);
+        fill.Width *= MathF.Abs(value) / 2f;
+
+        // Set base coordinate for rect start
+        if (value >= 0)
+        {
+            // centre point
+            fill.X = position.X + size.X / 2f;
+        }
+        else
+        {
+            // centre point 
+            fill.X = position.X + size.X / 2f * (1 + value);
+        }
         
+        // Override fill width if no input
+        if (value == 0)
+        {
+            fill.Width = 1;
+        }
+
         Raylib.DrawRectangleRec(fill, ColorFG);
         Raylib.DrawRectangleLinesEx(outline, 1, ColorBG);
     }
