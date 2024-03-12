@@ -49,6 +49,6 @@ internal class Program
         //x.Draw8bitdoGamepad(new(200, 200), 32, 50, 10);
 
         x.PollInputsForExistence();
-        x.DisplayExistingInputs(new(10, 10), 24, 5);
+        x.DisplayExistingInputs(10, 10, 24, 5);
     }
 }

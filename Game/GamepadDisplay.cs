@@ -153,7 +153,7 @@ public class GamepadDisplay
         }
     }
 
-    public void DisplayExistingInputs(Vector2 position, int fontSize, int gap)
+    public void DisplayExistingInputs(int X, int Y, int fontSize, int gap)
     {
         // buttons / circles
         float radius = fontSize / 2f;
@@ -166,31 +166,29 @@ public class GamepadDisplay
         string infoAxis = $"Axis Count: {AxisCount}";
 
         // INFORMATION
-        Raylib.DrawText(DeviceName, (int)position.X, (int)position.Y, fontSize, ColorBG);
-        position.Y += fontSize + gap;
-        Raylib.DrawText(infoID, (int)position.X, (int)position.Y, fontSize, ColorBG);
-        position.Y += fontSize + gap;
-        Raylib.DrawText(infoAxis, (int)position.X, (int)position.Y, fontSize, ColorBG);
-        position.Y += fontSize + gap;
+        Raylib.DrawText(DeviceName, X, Y, fontSize, ColorBG);
+        Y += fontSize + gap;
+        Raylib.DrawText(infoID, X, Y, fontSize, ColorBG);
+        Y += fontSize + gap;
+        Raylib.DrawText(infoAxis, X, Y, fontSize, ColorBG);
+        Y += fontSize + gap;
 
         // BUTTONS
-        int textX = (int)position.X + (int)(radius * 2 + gap);
+        int textX = X + (int)(radius * 2 + gap);
         foreach (var button in ExistingButtons)
         {
-            int textY = (int)position.Y;
-            DrawButtonDown(position + circleOffset, radius, button);
-            Raylib.DrawText(button.ToString(), textX, textY, fontSize, ColorBG);
-            position.Y += fontSize + gap;
+            DrawButtonDown(new Vector2(X, Y) + circleOffset, radius, button);
+            Raylib.DrawText(button.ToString(), textX, Y, fontSize, ColorBG);
+            Y += fontSize + gap;
         }
 
         // AXIS
-        textX = (int)position.X + axisDisplayWidth + gap;
+        textX = X + axisDisplayWidth + gap;
         foreach (var axis in ExistingAxes)
         {
-            int textY = (int)position.Y;
-            DrawAxis(position, rectSize, axis);
-            Raylib.DrawText(axis.ToString(), textX, textY, fontSize, ColorBG);
-            position.Y += fontSize + gap;
+            DrawAxis(new Vector2(X, Y), rectSize, axis);
+            Raylib.DrawText(axis.ToString(), textX, Y, fontSize, ColorBG);
+            Y += fontSize + gap;
         }
     }
 }
