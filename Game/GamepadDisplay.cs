@@ -1,23 +1,23 @@
 ﻿using Raylib_cs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 public class GamepadDisplay
 {
+    // "Constant" data
+    static readonly GamepadButton[] GamepadButtons = Enum.GetValues<GamepadButton>();
+    static readonly GamepadAxis[] GamepadAxes = Enum.GetValues<GamepadAxis>();
+
+    // Private state
     private List<GamepadButton> ExistingButtons = new List<GamepadButton>();
     private List<GamepadAxis> ExistingAxes = new List<GamepadAxis>();
+
+    // Instance state
     public int DeviceID { get; private set; }
     public Color ColorFG { get; set; } = Color.Red;
     public Color ColorBG { get; set; } = Color.Black;
     public string DeviceName => Raylib.GetGamepadName_(DeviceID);
     public int AxisCount => Raylib.GetGamepadAxisCount(DeviceID);
 
-    static readonly GamepadButton[] GamepadButtons = Enum.GetValues<GamepadButton>();
-    static readonly GamepadAxis[] GamepadAxes = Enum.GetValues<GamepadAxis>();
 
     public GamepadDisplay(int deviceID)
     {
@@ -39,50 +39,18 @@ public class GamepadDisplay
         }
         else
         {
-            // centre point 
+            // centre point minus rect size
             fill.X = position.X + size.X / 2f * (1 + value);
         }
         
         // Override fill width if no input
         if (value == 0)
         {
-            fill.Width = 1;
+            fill.Width = 1; // 1px
         }
 
         Raylib.DrawRectangleRec(fill, ColorFG);
         Raylib.DrawRectangleLinesEx(outline, 1, ColorBG);
-    }
-
-    public void DrawAxis2(Vector2 position, float radius, GamepadAxis x, GamepadAxis y)
-    {
-        float xAxis = Raylib.GetGamepadAxisMovement(DeviceID, x);
-        float yAxis = Raylib.GetGamepadAxisMovement(DeviceID, y);
-        Vector2 axis2 = new Vector2(xAxis, yAxis);
-
-        if (axis2.Length() > 1)
-            axis2 = Vector2.Normalize(axis2);
-
-        Vector2 axisPosition = axis2 * radius + position;
-
-        Raylib.DrawCircleLines((int)position.X, (int)position.Y, radius, ColorBG);
-        Raylib.DrawCircleV(axisPosition, radius / 10f, ColorFG);
-        Raylib.DrawLineV(position, axisPosition, ColorBG);
-    }
-
-    public void DrawDeviceInformation(Vector2 position, int fontSize)
-    {
-        int x = (int)position.X;
-        int y = (int)position.Y;
-        string info = $"ID{DeviceID:00}: {DeviceName}";
-        Raylib.DrawText(info, x, y, fontSize, ColorFG);
-    }
-    public void DrawDeviceInformation2(Vector2 position, int fontSize)
-    {
-        int x = (int)position.X;
-        int y = (int)position.Y;
-        string info = $"ID{DeviceID:00}. Axis count: {AxisCount}";
-        Raylib.DrawText(DeviceName, x, y, fontSize, ColorFG);
-        Raylib.DrawText(info, x, y + fontSize, fontSize, ColorFG);
     }
 
     public void DrawButton(Vector2 position, float radius, GamepadButton button, Func<int, GamepadButton, CBool> function)
@@ -102,28 +70,6 @@ public class GamepadDisplay
     public void DrawButtonReleased(Vector2 position, float radius, GamepadButton button)
         => DrawButton(position, radius, button, Raylib.IsGamepadButtonReleased);
 
-    public void Draw8bitdoGamepad(Vector2 position, int fontSize, float radius, int pad)
-    {
-        int px = (int)position.X;
-        int py = (int)position.Y;
-        int w = 200;
-        int h = 200;
-
-        // Draw rectangle for bounds
-        int totalW = w + pad * 2;
-        int totalH = h + pad * 2;
-        Raylib.DrawRectangleLines(px, py, totalW, totalH, ColorFG);
-
-        // Draw name + info
-        Vector2 textPos = position + new Vector2(pad, pad);
-        DrawDeviceInformation(textPos, fontSize);
-
-        //
-        Vector2 axisPosition = position + new Vector2(100, 100);
-        DrawAxis2(axisPosition, 50, GamepadAxis.LeftX, GamepadAxis.LeftY);
-
-    }
-
     public void PollInputsForExistence()
     {
         foreach (var button in GamepadButtons)
@@ -137,6 +83,7 @@ public class GamepadDisplay
                 continue;
 
             ExistingButtons.Add(button);
+            ExistingButtons.Sort();
         }
 
         foreach (var axis in GamepadAxes)
@@ -150,6 +97,7 @@ public class GamepadDisplay
                 continue;
 
             ExistingAxes.Add(axis);
+            ExistingAxes.Sort();
         }
     }
 
@@ -187,7 +135,9 @@ public class GamepadDisplay
         foreach (var axis in ExistingAxes)
         {
             DrawAxis(new Vector2(X, Y), rectSize, axis);
-            Raylib.DrawText(axis.ToString(), textX, Y, fontSize, ColorBG);
+            float axisValue = Raylib.GetGamepadAxisMovement(DeviceID, axis);
+            string label = $"{axis} {axisValue:0.00}";
+            Raylib.DrawText(label, textX, Y, fontSize, ColorBG);
             Y += fontSize + gap;
         }
     }

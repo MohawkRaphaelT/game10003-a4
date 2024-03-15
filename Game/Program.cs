@@ -5,7 +5,12 @@ internal class Program
 {
     // If you need variables in the Program class (outside functions), you must mark them as static
     static string title = "Game Title";
-    static GamepadDisplay x = new GamepadDisplay(0);
+    //static GamepadDisplay gamepadDisplay0 = new GamepadDisplay(0);
+    static List<GamepadDisplay> gamepadDisplays = new List<GamepadDisplay>();
+
+    const int displayGap = 10;
+    const int lineGap = 5;
+    const int fontSize = 24;
 
     static void Main(string[] args)
     {
@@ -43,12 +48,38 @@ internal class Program
     static void Update()
     {
         // Your game code run each frame here
-        //x.DrawDeviceInformation(new(10, 10), 32);
-        //x.DrawAxis2(new(200, 200), 50, GamepadAxis.LeftX, GamepadAxis.LeftY);
-        //x.DrawButtonDown(new(100, 200), 10, GamepadButton.RightFaceRight);
-        //x.Draw8bitdoGamepad(new(200, 200), 32, 50, 10);
+        for (int i = 0; i < 4; i++)
+        {
+            bool exists = Raylib.IsGamepadAvailable(i);
+            if (!exists)
+                continue;
 
-        x.PollInputsForExistence();
-        x.DisplayExistingInputs(10, 10, 24, 5);
+            bool isTracked = false;
+            foreach (GamepadDisplay display in gamepadDisplays)
+            {
+                if (display.DeviceID == i)
+                {
+                    isTracked = true;
+                    break;
+                }
+            }
+
+            if (isTracked)
+                continue;
+
+            GamepadDisplay gamepadDisplay = new GamepadDisplay(i);
+            gamepadDisplays.Add(gamepadDisplay);
+        }
+
+        for (int i = 0; i < gamepadDisplays.Count; i++)
+        {
+            GamepadDisplay gamepadDisplay = gamepadDisplays[i];
+
+            int stride = Raylib.GetScreenWidth() / gamepadDisplay.AxisCount;
+            int x = (stride * i) + (displayGap * (i + 1));
+
+            gamepadDisplay.PollInputsForExistence();
+            gamepadDisplay.DisplayExistingInputs(x, displayGap, fontSize, lineGap);
+        }
     }
 }
